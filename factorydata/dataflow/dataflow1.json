@@ -15,35 +15,31 @@
 			"sinks": [],
 			"transformations": [
 				{
-					"name": "select1"
-				},
-				{
-					"name": "REMOVENULLS"
+					"name": "select3"
 				}
 			],
 			"scriptLines": [
 				"source(output(",
-				"          movie as string,",
-				"          title as string,",
-				"          genres as string,",
-				"          year as string,",
-				"          Rating as string,",
-				"          {Rotton Tomato} as string",
+				"          {{\"movie\":\"108583\"} as string,",
+				"          {\"title\":\"Fawlty Towers (1975\"} as string,",
+				"          {\"genres\":\"Comedy\"} as string,",
+				"          {\"year\":\"-1980\"} as string,",
+				"          {\"Rating\":\"1\"} as string,",
+				"          {\"Rotton Tomato\":\"54\"} as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> source1",
-				"REMOVENULLS select(mapColumn(",
-				"          movie,",
-				"          title,",
-				"          genres,",
-				"          year,",
-				"          Rating,",
-				"          {Rotton Tomato}",
+				"source1 select(mapColumn(",
+				"          Col1 = {{\"movie\":\"108583\"},",
+				"          Col2 = {\"title\":\"Fawlty Towers (1975\"},",
+				"          Col3 = {\"genres\":\"Comedy\"},",
+				"          Col4 = {\"year\":\"-1980\"},",
+				"          Col5 = {\"Rating\":\"1\"},",
+				"          Col6 = {\"Rotton Tomato\":\"54\"}",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
-				"source1 filter(not(isNull(movie))) ~> REMOVENULLS"
+				"     skipDuplicateMapOutputs: true) ~> select3"
 			]
 		}
 	}
