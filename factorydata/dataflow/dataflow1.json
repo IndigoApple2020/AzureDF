@@ -49,6 +49,12 @@
 				},
 				{
 					"name": "RankMoviesByRatings"
+				},
+				{
+					"name": "AggregateRatings"
+				},
+				{
+					"name": "UpsertifTrue"
 				}
 			],
 			"scriptLines": [
@@ -106,7 +112,14 @@
 				"PrimaryGenre window(over(PrimaryGenre,",
 				"          Year),",
 				"     desc(Rating, true),",
-				"     RatingsRank = rank()) ~> RankMoviesByRatings"
+				"     RatingsRank = rank()) ~> RankMoviesByRatings",
+				"RankMoviesByRatings aggregate(groupBy(PrimaryGenre,",
+				"          Year),",
+				"     AverageRating = avg(toInteger(Rating)),",
+				"          HighestRated = first(Title),",
+				"          LowestRated = last(Title),",
+				"          NumberOfMovies = count()) ~> AggregateRatings",
+				"AggregateRatings alterRow(upsertIf(true())) ~> UpsertifTrue"
 			]
 		}
 	}
