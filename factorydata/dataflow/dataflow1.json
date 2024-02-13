@@ -12,7 +12,15 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "MoviesAggregatedOutput",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "select3"
@@ -119,7 +127,19 @@
 				"          HighestRated = first(Title),",
 				"          LowestRated = last(Title),",
 				"          NumberOfMovies = count()) ~> AggregateRatings",
-				"AggregateRatings alterRow(upsertIf(true())) ~> UpsertifTrue"
+				"AggregateRatings alterRow(upsertIf(true())) ~> UpsertifTrue",
+				"UpsertifTrue sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          movie as string,",
+				"          title as string,",
+				"          genres as string,",
+				"          year as string,",
+				"          Rating as string,",
+				"          {Rotton Tomato} as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
