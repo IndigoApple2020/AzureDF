@@ -16,6 +16,30 @@
 			"transformations": [
 				{
 					"name": "select3"
+				},
+				{
+					"name": "CleanIDandTitle"
+				},
+				{
+					"name": "ConcatCols"
+				},
+				{
+					"name": "DeleteCols"
+				},
+				{
+					"name": "DefineTitle"
+				},
+				{
+					"name": "DefineGenres"
+				},
+				{
+					"name": "DefineYear"
+				},
+				{
+					"name": "DefineRating"
+				},
+				{
+					"name": "FinalisedCols"
 				}
 			],
 			"scriptLines": [
@@ -39,7 +63,35 @@
 				"          Col6 = {\"Rotton Tomato\":\"54\"}",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select3"
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select3 derive(Col1 = substring(Col1, 11, length(Col1) - 11)\r",
+				",",
+				"          Col2 = substring(Col2, 10, length(Col2) - 9)\r",
+				") ~> CleanIDandTitle",
+				"CleanIDandTitle derive(Concat = concat(Col2, Col3, Col4, Col5)) ~> ConcatCols",
+				"ConcatCols select(mapColumn(",
+				"          Col1,",
+				"          Concat",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> DeleteCols",
+				"DeleteCols derive(Title = split(Concat, '\"\"genres\":\"')[1]\r",
+				",",
+				"          ConcatA = split(Concat, '\"\"genres\":\"')[2]) ~> DefineTitle",
+				"DefineTitle derive(Genres = split(ConcatA, '\"\"year\":\"')[1],",
+				"          ConcatB = split(ConcatA, '\"\"year\":\"')[2]) ~> DefineGenres",
+				"DefineGenres derive(Year = split(ConcatB, '\"')[1],",
+				"          ConcatC = split(ConcatB, 'Rating\":\"')[2]) ~> DefineYear",
+				"DefineYear derive(Rating = split(ConcatC, '\"')[1]) ~> DefineRating",
+				"DefineRating select(mapColumn(",
+				"          Col1,",
+				"          Title,",
+				"          Genres,",
+				"          Year,",
+				"          Rating",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> FinalisedCols"
 			]
 		}
 	}
