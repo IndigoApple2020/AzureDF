@@ -40,6 +40,15 @@
 				},
 				{
 					"name": "FinalisedCols"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "PrimaryGenre"
+				},
+				{
+					"name": "RankMoviesByRatings"
 				}
 			],
 			"scriptLines": [
@@ -80,9 +89,9 @@
 				"          ConcatA = split(Concat, '\"\"genres\":\"')[2]) ~> DefineTitle",
 				"DefineTitle derive(Genres = split(ConcatA, '\"\"year\":\"')[1],",
 				"          ConcatB = split(ConcatA, '\"\"year\":\"')[2]) ~> DefineGenres",
-				"DefineGenres derive(Year = split(ConcatB, '\"')[1],",
+				"DefineGenres derive(Year = toInteger(split(ConcatB, '\"')[1]),",
 				"          ConcatC = split(ConcatB, 'Rating\":\"')[2]) ~> DefineYear",
-				"DefineYear derive(Rating = split(ConcatC, '\"')[1]) ~> DefineRating",
+				"DefineYear derive(Rating = toInteger(split(ConcatC, '\"')[1])) ~> DefineRating",
 				"DefineRating select(mapColumn(",
 				"          Col1,",
 				"          Title,",
@@ -91,7 +100,13 @@
 				"          Rating",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> FinalisedCols"
+				"     skipDuplicateMapOutputs: true) ~> FinalisedCols",
+				"FinalisedCols filter(and(toInteger(Year)>1950, not(isNull(Rating))) ) ~> filter1",
+				"filter1 derive(PrimaryGenre = iif(locate('|', Genres) > 1, left(Genres, locate('|', Genres)-1), Genres)) ~> PrimaryGenre",
+				"PrimaryGenre window(over(PrimaryGenre,",
+				"          Year),",
+				"     desc(Rating, true),",
+				"     RatingsRank = rank()) ~> RankMoviesByRatings"
 			]
 		}
 	}
